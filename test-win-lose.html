@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Escape Game - Win/Lose Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2000;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .test-controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .test-controls button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h4 style="color: white; margin: 0 0 10px 0;">Test Controls</h4>
+        <button onclick="testVictory()">Test Victory</button>
+        <button onclick="testGameOver()">Test Game Over</button>
+        <button onclick="resetTimer()">Reset Timer</button>
+    </div>
+    
+    <div id="game-container">
+        <div id="game-canvas"></div>
+    </div>
+    
+    <script src="phaser.min.js"></script>
+    <script src="game.js"></script>
+    
+    <script>
+        // Test functions to trigger win/lose states
+        function testVictory() {
+            if (game && game.scene && game.scene.scenes[0]) {
+                const scene = game.scene.scenes[0];
+                // Move all characters to right side
+                scene.gameState.characters.forEach(char => {
+                    char.side = 'right';
+                });
+                scene.gameState.checkVictoryCondition();
+                scene.checkGameEndConditions();
+            }
+        }
+        
+        function testGameOver() {
+            if (game && game.scene && game.scene.scenes[0]) {
+                const scene = game.scene.scenes[0];
+                // Set timer to 0
+                scene.gameState.timeRemaining = 0;
+                scene.checkGameEndConditions();
+            }
+        }
+        
+        function resetTimer() {
+            if (game && game.scene && game.scene.scenes[0]) {
+                const scene = game.scene.scenes[0];
+                scene.gameState.timeRemaining = 17;
+                scene.gameState.gameStatus = 'playing';
+                scene.updateTimerDisplay();
+            }
+        }
+    </script>
+</body>
+</html>

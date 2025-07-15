@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bridge Escape Game - Responsive Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Test overlay for responsive debugging */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+        
+        .test-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            font-family: Arial;
+            font-size: 12px;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+        
+        .test-controls button {
+            display: block;
+            margin: 5px 0;
+            padding: 5px 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .test-controls button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info" id="debug-info">
+        Screen: <span id="screen-size"></span><br>
+        Game: <span id="game-size"></span><br>
+        Scale: <span id="scale-factor"></span><br>
+        Mobile: <span id="is-mobile"></span><br>
+        Orientation: <span id="orientation"></span>
+    </div>
+    
+    <div class="test-controls">
+        <button onclick="simulateMobile()">Simulate Mobile</button>
+        <button onclick="simulateTablet()">Simulate Tablet</button>
+        <button onclick="simulateDesktop()">Simulate Desktop</button>
+        <button onclick="testTouchEvents()">Test Touch Events</button>
+    </div>
+    
+    <div id="game-container">
+        <div id="game-canvas"></div>
+    </div>
+    
+    <script src="phaser.min.js"></script>
+    <script src="game.js"></script>
+    
+    <script>
+        // Responsive testing utilities
+        function updateDebugInfo() {
+            const screenSize = `${window.innerWidth}x${window.innerHeight}`;
+            const gameSize = game ? `${game.scale.gameSize.width}x${game.scale.gameSize.height}` : 'N/A';
+            const scaleFactor = game && game.scene.scenes[0] ? game.scene.scenes[0].scaleFactor : 'N/A';
+            const isMobile = game && game.scene.scenes[0] ? game.scene.scenes[0].isMobile : 'N/A';
+            const orientation = screen.orientation ? screen.orientation.angle : 'N/A';
+            
+            document.getElementById('screen-size').textContent = screenSize;
+            document.getElementById('game-size').textContent = gameSize;
+            document.getElementById('scale-factor').textContent = scaleFactor;
+            document.getElementById('is-mobile').textContent = isMobile;
+            document.getElementById('orientation').textContent = orientation;
+        }
+        
+        function simulateMobile() {
+            document.body.style.width = '375px';
+            document.body.style.height = '667px';
+            setTimeout(() => {
+                if (game) game.scale.refresh();
+                updateDebugInfo();
+            }, 100);
+        }
+        
+        function simulateTablet() {
+            document.body.style.width = '768px';
+            document.body.style.height = '1024px';
+            setTimeout(() => {
+                if (game) game.scale.refresh();
+                updateDebugInfo();
+            }, 100);
+        }
+        
+        function simulateDesktop() {
+            document.body.style.width = '1200px';
+            document.body.style.height = '800px';
+            setTimeout(() => {
+                if (game) game.scale.refresh();
+                updateDebugInfo();
+            }, 100);
+        }
+        
+        function testTouchEvents() {
+            console.log('Testing touch events...');
+            if (game && game.scene.scenes[0]) {
+                const scene = game.scene.scenes[0];
+                console.log('Touch-friendly sizes:', {
+                    characterSprite: scene.getTouchFriendlySize(32),
+                    button: scene.getTouchFriendlySize(40),
+                    highlight: scene.getTouchFriendlySize(20)
+                });
+            }
+        }
+        
+        // Update debug info periodically
+        setInterval(updateDebugInfo, 1000);
+        
+        // Update on resize
+        window.addEventListener('resize', () => {
+            setTimeout(updateDebugInfo, 100);
+        });
+        
+        // Update on orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateDebugInfo, 500);
+        });
+    </script>
+</body>
+</html>

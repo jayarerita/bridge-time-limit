@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer System Test</title>
+</head>
+<body>
+    <h1>Timer System Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Test the GameState timer functionality
+        class GameState {
+            constructor() {
+                this.timeRemaining = 17; // minutes remaining
+                this.lanternSide = 'left'; // which side the lantern is on
+                this.gameStatus = 'playing'; // 'playing', 'won', 'lost'
+                this.moveHistory = []; // array of move records
+                this.characters = this.initializeCharacters();
+            }
+
+            initializeCharacters() {
+                return [
+                    { name: 'You', crossingTime: 1, side: 'left' },
+                    { name: 'Lab Assistant', crossingTime: 2, side: 'left' },
+                    { name: 'Janitor', crossingTime: 5, side: 'left' },
+                    { name: 'Professor', crossingTime: 10, side: 'left' }
+                ];
+            }
+
+            updateTimer(timeUsed) {
+                this.timeRemaining -= timeUsed;
+                if (this.timeRemaining <= 0) {
+                    this.timeRemaining = 0;
+                    this.gameStatus = 'lost';
+                }
+                
+                // Check victory condition after timer update
+                this.checkVictoryCondition();
+            }
+
+            getFormattedTime() {
+                const minutes = Math.floor(this.timeRemaining);
+                const seconds = Math.floor((this.timeRemaining - minutes) * 60);
+                
+                if (seconds > 0) {
+                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    return `${minutes}:00`;
+                }
+            }
+
+            isCriticalTime() {
+                return this.timeRemaining <= 3;
+            }
+
+            isWarningTime() {
+                return this.timeRemaining <= 7;
+            }
+
+            getCharactersOnSide(side) {
+                return this.characters.filter(char => char.side === side);
+            }
+
+            checkVictoryCondition() {
+                const charactersOnRight = this.getCharactersOnSide('right');
+                if (charactersOnRight.length === this.characters.length) {
+                    this.gameStatus = 'won';
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        // Run tests
+        function runTests() {
+            const results = [];
+            
+            // Test 1: Initial timer state
+            const gameState1 = new GameState();
+            results.push(`Test 1 - Initial timer: ${gameState1.getFormattedTime()} (Expected: 17:00) - ${gameState1.getFormattedTime() === '17:00' ? 'PASS' : 'FAIL'}`);
+            
+            // Test 2: Timer update
+            gameState1.updateTimer(2.5);
+            results.push(`Test 2 - After 2.5 minutes: ${gameState1.getFormattedTime()} (Expected: 14:30) - ${gameState1.getFormattedTime() === '14:30' ? 'PASS' : 'FAIL'}`);
+            
+            // Test 3: Critical time detection
+            const gameState2 = new GameState();
+            gameState2.timeRemaining = 2.5;
+            results.push(`Test 3 - Critical time detection: ${gameState2.isCriticalTime()} (Expected: true) - ${gameState2.isCriticalTime() === true ? 'PASS' : 'FAIL'}`);
+            
+            // Test 4: Warning time detection
+            const gameState3 = new GameState();
+            gameState3.timeRemaining = 5;
+            results.push(`Test 4 - Warning time detection: ${gameState3.isWarningTime()} (Expected: true) - ${gameState3.isWarningTime() === true ? 'PASS' : 'FAIL'}`);
+            
+            // Test 5: Game over condition
+            const gameState4 = new GameState();
+            gameState4.updateTimer(18);
+            results.push(`Test 5 - Game over condition: ${gameState4.gameStatus} (Expected: lost) - ${gameState4.gameStatus === 'lost' ? 'PASS' : 'FAIL'}`);
+            
+            // Test 6: Victory condition
+            const gameState5 = new GameState();
+            gameState5.characters.forEach(char => char.side = 'right');
+            gameState5.checkVictoryCondition();
+            results.push(`Test 6 - Victory condition: ${gameState5.gameStatus} (Expected: won) - ${gameState5.gameStatus === 'won' ? 'PASS' : 'FAIL'}`);
+            
+            return results;
+        }
+
+        // Display test results
+        const testResults = runTests();
+        const resultsDiv = document.getElementById('test-results');
+        resultsDiv.innerHTML = '<h2>Test Results:</h2><ul>' + 
+            testResults.map(result => `<li>${result}</li>`).join('') + 
+            '</ul>';
+        
+        console.log('Timer System Tests:', testResults);
+    </script>
+</body>
+</html>
